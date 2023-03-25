@@ -1,0 +1,123 @@
+# The Caddyfile is an easy way to configure your Caddy web server.
+
+# Refer to the Caddy docs for more information:
+# https://caddyserver.com/docs/caddyfile
+
+{
+  email <email>
+}
+
+(dnschallenge) {
+  tls {
+    dns cloudflare <cloudflare_token>
+    resolvers 1.1.1.1
+  }
+}
+
+http://*.example.com {
+  redir https://{host}{uri}
+}
+
+*.example.com {
+  import dnschallenge
+
+  @truenas host truenas.example.com
+  handle @truenas {
+    reverse_proxy <ip_address>
+  }
+
+  @hubitat host hubitat.example.com
+  handle @hubitat {
+    reverse_proxy <ip_address>
+  }
+
+  @plex host plex.example.com
+  handle @plex {
+    reverse_proxy <ip_address>:32400 {
+      transport http {
+        tls
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  @s3 host s3.example.com
+  handle @s3 {
+    reverse_proxy <ip_address>:9000 {
+      header_up X-Forwarded-Proto {scheme}
+      header_up X-Forwarded-Host {host}
+      header_up Host {host}
+      health_uri /minio/health/ready
+    }
+  }
+
+  @s3console host s3console.example.com
+  handle @s3console {
+    reverse_proxy <ip_address>:9001 {
+      header_up X-Forwarded-Proto {scheme}
+      header_up X-Forwarded-Host {host}
+      header_up Host {host}
+      health_uri /minio/health/ready
+    }
+  }
+
+  @unifi host unifi.example.com
+  handle @unifi {
+    reverse_proxy <ip_address>:443 {
+      transport http {
+        tls
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  @nextcloud host nextcloud.example.com
+  handle @nextcloud {
+    reverse_proxy <ip_address>:443 {
+      transport http {
+        tls
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  @pfelk host pfelk.example.com
+  handle @pfelk {
+    reverse_proxy <ip_address>:5601
+  }
+
+  @smokeping host smokeping.example.com
+  handle @smokeping {
+    reverse_proxy <ip_address>:443 {
+      transport http {
+        tls
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  @xoa host xoa.example.com
+  handle @xoa {
+    reverse_proxy <ip_address>
+  }
+
+  @xoa-community host xoa-community.example.com
+  handle @xoa-community {
+    reverse_proxy <ip_address>
+  }
+
+  @pve host pve.example.com
+  handle @pve {
+    reverse_proxy <ip_address>:8006 {
+      transport http {
+        tls
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  handle {
+    abort
+  }
+}
+

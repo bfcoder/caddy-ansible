@@ -1,0 +1,6 @@
+[caddy-server]
+192.168.42.6
+
+[caddy-server:vars]
+ansible_ssh_user=ubuntu
+ansible_user=ubuntu

@@ -1,0 +1,20 @@
+---
+version: "3.9"
+
+services:
+  caddy:
+    image: ghcr.io/slothcroissant/caddy-cloudflaredns:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - /opt/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - /opt/caddy/site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

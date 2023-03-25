@@ -1,0 +1,49 @@
+---
+- name: Create /opt/caddy directory
+  file:
+    path: "/opt/caddy"
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rwx,g=rwx,o=
+
+- name: Create /opt/caddy/site directory
+  file:
+    path: "/opt/caddy/site"
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rwx,g=rwx,o=
+
+- name: Copy Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile
+    dest: /opt/caddy/Caddyfile
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rw,g=r,o=
+
+- name: Copy docker-compose.yml for web app
+  template:
+    src: docker-compose.yml
+    dest: /opt/caddy/docker-compose.yml
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rw,g=r,o=
+  become: yes
+
+- name: Copy caddy service
+  template:
+    src: systemd/caddy.service
+    dest: /etc/systemd/system/caddy.service
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rw,g=r,o=
+  become: yes
+
+- name: Enable caddy service
+  systemd:
+    state: started
+    enabled: yes
+    daemon_reload: yes
+    name: caddy
