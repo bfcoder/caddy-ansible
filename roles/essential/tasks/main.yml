@@ -12,3 +12,10 @@
     state: present
     update_cache: true
   become: yes
+
+- name: Install Vim
+  apt:
+    pkg: vim
+    state: present
+    update_cache: true
+  become: yes
